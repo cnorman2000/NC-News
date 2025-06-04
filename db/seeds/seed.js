@@ -1,17 +1,13 @@
 const db = require("../connection");
 const format = require ('pg-format');
-const data = require("../data/test-data/articles");
-const { convertTimestampToDate } = require('./utils.js');
+const { convertTimestampToDate, createLookupObject } = require('./utils.js');
 
 const seed = ({ topicData, userData, articleData, commentData }) => {
+
   return db.query(`DROP TABLE IF EXISTS comments`)
-    .then(() => {
-    return db.query(`DROP TABLE IF EXISTS articles`)
-  }).then(() => {
-    return db.query(`DROP TABLE IF EXISTS users`)
-  }).then(() => {
-    return db.query(`DROP TABLE IF EXISTS topics`)
-  })
+    .then(() => { return db.query(`DROP TABLE IF EXISTS articles`) })
+    .then(() => { return db.query(`DROP TABLE IF EXISTS users`) })
+    .then(() => {return db.query(`DROP TABLE IF EXISTS topics`)})
     
     
     .then(() => {
@@ -60,29 +56,38 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
     })
     
     .then(() => {
-    const formattedUserValues = userData.map(({username, name, avatar_url}) => {
-      return [username, name, avatar_url]
-    })
-    const sqlUserString = format(`INSERT INTO users(username, name, avatar_url) VALUES %L`, formattedUserValues)
-     return db.query(sqlUserString)   
-    })
-    
-    .then(() => {
-    const formatedTimeStamp = articleData.map(convertTimestampToDate)
-    const formattedArticleValues = formatedTimeStamp.map(({title, topic, author, body, created_at, votes, article_img_url}) => {
-    return [title, topic, author, body, created_at, votes, article_img_url]
-    })
-    const sqlArticleString = format(`INSERT INTO articles(title, topic, author, body, created_at, votes, article_img_url) VALUES %L`, formattedArticleValues)
-    return db.query(sqlArticleString)   
+      const formattedUserValues = userData.map(({username, name, avatar_url}) => {
+        return [username, name, avatar_url]
+      })
+
+      const sqlUserString = format(`INSERT INTO users(username, name, avatar_url) VALUES %L`, formattedUserValues)
+      return db.query(sqlUserString)   
     })
     
     .then(() => {
-    const formatedTimeStamp = commentData.map(convertTimestampToDate)
-    const formattedCommentValues = formatedTimeStamp.map(({article_id, body, votes, author, created_at}) => {
-    return [article_id, body, votes, author, created_at]
+      const formatedTimeStamp = articleData.map(convertTimestampToDate)
+      const formattedArticleValues = formatedTimeStamp.map(({title, topic, author, body, created_at, votes, article_img_url}) => {
+      return [title, topic, author, body, created_at, votes, article_img_url]
+      })
+
+      const sqlArticleString = format(`INSERT INTO articles(title, topic, author, body,   created_at, votes, article_img_url) VALUES %L RETURNING *`, formattedArticleValues)
+      // console.log(sqlArticleString)
+      return db.query(sqlArticleString)   
     })
-    const sqlCommentString = format(`INSERT INTO comments(article_id, body, votes, author, created_at) VALUES %L`, formattedCommentValues)
-    return db.query(sqlCommentString)
+    
+    .then(({ rows }) => {
+      // console.log(rows)
+      const keys = "title"
+      const value = "article_id"
+      const lookupObject = createLookupObject(rows, keys, value)
+      const formatedTimeStamp = commentData.map(convertTimestampToDate)
+      const formattedCommentValues = formatedTimeStamp.map(({article_title, body, votes, author, created_at}) => {
+      return [lookupObject[article_title], body, votes, author, created_at]
+      })
+
+      const sqlCommentString = format(`INSERT INTO comments(article_id, body, votes, author, created_at) VALUES %L`, formattedCommentValues)
+      console.log(sqlCommentString)
+      return db.query(sqlCommentString)
   }) 
   
 };
