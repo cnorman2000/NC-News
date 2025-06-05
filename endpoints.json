@@ -23,5 +23,12 @@
         }
       ]
     }
+  },
+  "GET /api/users": {
+    "description": "serves an array of all users",
+    "queries": [],
+    "exampleResponse": {
+      "users": [{ "username": "butter_bridge", "name": "jonny", "avatar_url": "http://thisIsAnExampleURL.jpg" }]
+    }
   }
 }
