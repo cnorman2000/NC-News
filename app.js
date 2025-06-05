@@ -8,6 +8,12 @@ app.use(express.json());
 
 app.get('/api', getApi)
 
+app.use(handlePostgressErrors);
+
+app.use(handleCustomErrors);
+
+app.use(handleServerErrors);
+
 module.exports = app;
 
 
