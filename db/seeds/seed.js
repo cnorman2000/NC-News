@@ -86,7 +86,7 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
       })
 
       const sqlCommentString = format(`INSERT INTO comments(article_id, body, votes, author, created_at) VALUES %L`, formattedCommentValues)
-      console.log(sqlCommentString)
+      
       return db.query(sqlCommentString)
   }) 
   

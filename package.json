@@ -23,18 +23,21 @@
   },
   "homepage": "https://github.com/northcoders/be-nc-news#readme",
   "devDependencies": {
+    "dotenv": "^16.5.0",
     "husky": "^8.0.2",
     "jest": "^27.5.1",
     "jest-extended": "^2.0.0",
-    "pg-format": "^1.0.4"
-  },
-  "dependencies": {
-    "dotenv": "^16.4.7",
-    "pg": "^8.13.3"
+    "nodemon": "^3.1.10",
+    "pg": "^8.16.0",
+    "pg-format": "^1.0.4",
+    "supertest": "^7.1.1"
   },
   "jest": {
     "setupFilesAfterEnv": [
       "jest-extended/all"
     ]
+  },
+  "dependencies": {
+    "express": "^5.1.0"
   }
 }
