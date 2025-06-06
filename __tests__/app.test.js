@@ -66,6 +66,17 @@ describe("GET /api/articles", () => {
           })
       })
     
+    })
+  test("200: The object that is returned will be sorted according to the values in the articles.created_at column", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles[0].article_id).toBe(3)
+        expect(articles[1].article_id).toBe(6)
+        expect(articles[2].article_id).toBe(2)
+
+      })
   })
 })
 
