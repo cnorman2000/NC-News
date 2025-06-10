@@ -161,7 +161,7 @@ describe("GET /api/articles/:article_id/comments", () => {
 });
 
 describe("POST /post/articles/:article_id/comments", () => {
-  test.only("200: Responds with the posted comment", () => {
+  test("200: Responds with the posted comment", () => {
     const newComment = {
       username: "donut123",
       body: "This is a new comment",
@@ -204,7 +204,7 @@ describe("PATCH /api/articles/:article_id", () => {
         expect(article.votes).toBe(100);
       });
   });
-  test("200: Responds with an updated article object with the votes count increased", () => {
+  test("200: Increase vote counts", () => {
     const articleId = 1;
     const newVotes = { inc_votes: 2 };
     return request(app)
@@ -232,7 +232,7 @@ describe("PATCH /api/articles/:article_id", () => {
         expect(typeof article_img_url).toBe("string");
       });
   });
-  test("200: Responds with an updated article object with the votes count decreased", () => {
+  test("200: Decrease votes count", () => {
     const articleId = 1;
     const newVotes = { inc_votes: -7 };
     return request(app)
