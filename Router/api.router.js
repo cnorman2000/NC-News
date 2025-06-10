@@ -1,7 +1,7 @@
 const apiRouter = require("express").Router();
 
-const { getApi } = require("../Controllers/api.controller");
+const { fetchApi } = require("../Controllers/api.controller");
 
-apiRouter.get("/", getApi);
+apiRouter.get("/", fetchApi);
 
 module.exports = apiRouter;
