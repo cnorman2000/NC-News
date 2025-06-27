@@ -10,7 +10,7 @@ exports.selectCommentsByArticle = (article_id) => {
   });
 };
 
-exports.addComment = (article_id, username, body) => {
+exports.insertComment = (article_id, username, body) => {
   console.log("comments model");
 
   return db
@@ -19,6 +19,7 @@ exports.addComment = (article_id, username, body) => {
       [article_id, username, body]
     )
     .then(({ rows }) => {
+      console.log(rows);
       return rows[0];
     });
 };

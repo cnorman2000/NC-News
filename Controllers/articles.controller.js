@@ -1,6 +1,7 @@
 const {
   selectArticles,
   selectArticleByID,
+  updateArticleVotes,
 } = require("../Models/articles.model");
 
 exports.fetchArticles = (req, res, next) => {
@@ -27,6 +28,8 @@ exports.fetchArticleByID = (req, res, next) => {
 exports.patchByArticleId = (request, response, next) => {
   const { article_id } = request.params;
   const { inc_votes } = request.body;
+  console.log(`controller ${article_id}`);
+  console.log(`controller ${inc_votes}`);
   if (inc_votes === undefined) {
     return next({
       status: 400,
@@ -39,6 +42,7 @@ exports.patchByArticleId = (request, response, next) => {
   updateArticleVotes(article_id, inc_votes)
     .then((article) => {
       response.status(200).send({ article });
+      // console.log(article);
     })
     .catch((err) => {
       next(err);

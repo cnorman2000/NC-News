@@ -160,55 +160,63 @@ describe("GET /api/articles/:article_id/comments", () => {
   });
 });
 
-describe("POST /post/articles/:article_id/comments", () => {
-  test("200: Responds with the posted comment", () => {
-    const newComment = {
-      username: "donut123",
-      body: "This is a new comment",
-    };
-    return request(app)
-      .post("/api/articles/3/comments")
-      .send(newComment)
-      .expect(200)
-      .then(({ body }) => {
-        const {
-          comment_id,
-          votes,
-          created_at,
-          author,
-          body: new_comment_body,
-          article_id,
-        } = body.comment;
-
-        expect(typeof comment_id).toBe("number");
-        expect(typeof votes).toBe("number");
-        expect(typeof created_at).toBe("string");
-        expect(typeof author).toBe("string");
-        expect(typeof new_comment_body).toBe("string");
-        expect(article_id).toBe(3);
-      });
+describe("POST /api/articles/:article_id/comments", () => {
+  test("200: Request body accepts an object with username and body, adds comment to table, reponds with object with key postedComment containing the posted comment object", async () => {
+    const {
+      body: { postedComment },
+    } = await request(app)
+      .post("/api/articles/1/comments")
+      .send({ username: "rogersop", body: "test_comment" })
+      .expect(200);
+    const { comment_id, votes, created_at, author, body, article_id } =
+      postedComment;
+    expect(Object.keys(postedComment).length).toBe(6);
+    expect(typeof comment_id).toBe("number");
+    expect(typeof votes).toBe("number");
+    expect(typeof created_at).toBe("string");
+    expect(author).toBe("rogersop");
+    expect(body).toBe("test_comment");
+    expect(article_id).toBe(1);
+  });
+  test("400: responds with an error if req body doesn't contain body key", async () => {
+    const {
+      body: { msg },
+    } = await request(app)
+      .post("/api/articles/1/comments")
+      .send({ username: "rogersop" })
+      .expect(400);
+    expect(msg).toBe("bad request: request body missing a necessary key");
+  });
+  test("400: responds with an error if req body doesn't contain username key", async () => {
+    const {
+      body: { msg },
+    } = await request(app)
+      .post("/api/articles/1/comments")
+      .send({ body: "some text" })
+      .expect(400);
+    expect(msg).toBe("bad request: request body missing a necessary key");
   });
 });
 
 describe("PATCH /api/articles/:article_id", () => {
   test("200: Responds with an unmodified article object when it has 0 votes", () => {
-    const articleId = 1;
     const incVotes = 0;
     const body = { inc_votes: incVotes };
     return request(app)
-      .patch(`/api/articles/${articleId}`)
+      .patch(`/api/articles/1`)
       .send(body)
       .expect(200)
       .then(({ body }) => {
+        // console.log(body);
         const { article } = body;
+        // console.log(`test ${article}`);
         expect(article.votes).toBe(100);
       });
   });
   test("200: Increase vote counts", () => {
-    const articleId = 1;
     const newVotes = { inc_votes: 2 };
     return request(app)
-      .patch(`/api/articles/${articleId}`)
+      .patch(`/api/articles/1`)
       .send(newVotes)
       .expect(200)
       .then(({ body }) => {
@@ -233,10 +241,9 @@ describe("PATCH /api/articles/:article_id", () => {
       });
   });
   test("200: Decrease votes count", () => {
-    const articleId = 1;
     const newVotes = { inc_votes: -7 };
     return request(app)
-      .patch(`/api/articles/${articleId}`)
+      .patch(`/api/articles/1`)
       .send(newVotes)
       .expect(200)
       .then(({ body }) => {
@@ -261,3 +268,33 @@ describe("PATCH /api/articles/:article_id", () => {
       });
   });
 });
+
+// describe("PATCH /api/articles/:article_id", () => {
+//   test("201: request body accepts an object {inc_votes: newVote} where newVote is an integer, increase or decreases votes val for article with :article_id by newvotes, returns object with updatedArticle key with the updated article object as it's value", async () => {
+//     const {
+//       body: { updatedArticle },
+//     } = await request(app)
+//       .patch("/api/articles/1")
+//       .send({ inc_votes: -10 })
+//       .expect(200);
+//     const {
+//       author,
+//       title,
+//       article_id,
+//       body,
+//       topic,
+//       created_at,
+//       votes,
+//       article_img_url,
+//     } = updatedArticle;
+//     expect(Object.keys(updatedArticle).length).toBe(8);
+//     expect(typeof author).toBe("string");
+//     expect(typeof title).toBe("string");
+//     expect(article_id).toBe(1);
+//     expect(typeof body).toBe("string");
+//     expect(typeof topic).toBe("string");
+//     expect(typeof created_at).toBe("string");
+//     expect(typeof votes).toBe("number");
+//     expect(typeof article_img_url).toBe("string");
+//   });
+// });

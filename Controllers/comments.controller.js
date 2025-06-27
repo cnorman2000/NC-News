@@ -1,8 +1,8 @@
-const { request } = require("../app");
 const {
   selectCommentsByArticle,
-  addComment,
+  insertComment,
 } = require("../Models/comments.model");
+const { selectArticleById } = require("../Models/articles.model.js");
 
 exports.fetchCommentsByArticle = (request, res, next) => {
   console.log(request.params);
@@ -23,24 +23,26 @@ exports.postComment = (request, response, next) => {
   const { username, body } = request.body;
 
   console.log("comments controller", article_id);
+  console.log(username);
 
   if (!username || typeof username !== "string") {
     return next({
       status: 400,
-      msg: "Bad request - username is not assigned",
+      msg: "bad request: request body missing a necessary key",
     });
   }
   if (!body || typeof body !== "string") {
     return next({
       status: 400,
-      msg: "Bad request - body is not assigned",
+      msg: "bad request: request body missing a necessary key",
     });
   }
-  addComment(article_id, username, body)
-    .then((comment) => {
-      response.status(200).send({ comment });
+  insertComment(article_id, username, body)
+    .then((postedComment) => {
+      response.status(200).send({ postedComment });
     })
     .catch((err) => {
+      console.log(err);
       next(err);
     });
 };
